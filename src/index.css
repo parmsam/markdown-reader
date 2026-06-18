@@ -215,6 +215,16 @@
     padding: 0 1px;
   }
 
+  /* Individual word click targets */
+  .word-clickable {
+    cursor: pointer;
+    border-radius: 3px;
+    transition: background 80ms;
+  }
+  .word-clickable:hover:not(.word-active) {
+    background: var(--sentence-bg);
+  }
+
   /* ── Scrollbar ── */
   ::-webkit-scrollbar { width: 5px; height: 5px; }
   ::-webkit-scrollbar-track { background: transparent; }

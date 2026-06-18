@@ -20,11 +20,9 @@ export function MarkdownViewer({
 }: Props) {
   const containerRef = useRef<HTMLDivElement>(null);
   const activeRef = useRef<HTMLElement | null>(null);
-  // Track whether the user is manually scrolling so we don't hijack their scroll
   const userScrollingRef = useRef(false);
   const scrollTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
-  // Listen for user scroll and pause auto-scroll for 2.5s
   useEffect(() => {
     const el = containerRef.current;
     if (!el) return;
@@ -42,22 +40,15 @@ export function MarkdownViewer({
     };
   }, []);
 
-  // Auto-scroll only if the active element is out of the viewport AND user isn't scrolling
   useEffect(() => {
     if (!activeRef.current || userScrollingRef.current) return;
     const container = containerRef.current;
     if (!container) return;
-
     const el = activeRef.current;
     const elRect = el.getBoundingClientRect();
     const cRect = container.getBoundingClientRect();
-
-    const isVisible =
-      elRect.top >= cRect.top + 60 && elRect.bottom <= cRect.bottom - 120;
-
-    if (!isVisible) {
-      el.scrollIntoView({ behavior: "smooth", block: "center" });
-    }
+    const isVisible = elRect.top >= cRect.top + 60 && elRect.bottom <= cRect.bottom - 120;
+    if (!isVisible) el.scrollIntoView({ behavior: "smooth", block: "center" });
   }, [currentSegment]);
 
   const segmentWords = useMemo(
@@ -126,9 +117,7 @@ function MarkdownBlock({
   const isList = /^[-*+]\s|^\d+\.\s/.test(block);
 
   const setActiveRef = useCallback(
-    (el: HTMLElement | null) => {
-      if (el) activeRef.current = el;
-    },
+    (el: HTMLElement | null) => { if (el) activeRef.current = el; },
     [activeRef]
   );
 
@@ -139,7 +128,6 @@ function MarkdownBlock({
   if (isHeading || isBlockquote || isList) {
     const segInfo = blockSegs[0];
     const isActive = segInfo?.idx === currentSegment;
-
     return (
       <div
         ref={isActive ? setActiveRef : undefined}
@@ -153,11 +141,10 @@ function MarkdownBlock({
     );
   }
 
-  // Paragraph — may span multiple sentence segments
+  // Single-sentence paragraph
   if (blockSegs.length <= 1) {
     const segInfo = blockSegs[0];
     const isActive = segInfo?.idx === currentSegment;
-
     return (
       <p
         ref={isActive ? setActiveRef : undefined}
@@ -167,13 +154,14 @@ function MarkdownBlock({
         }`}
       >
         {isActive && segmentWords[segInfo.idx]?.length > 0
-          ? renderWordHighlights(block, currentWord)
+          ? renderWords(segInfo.seg.rawText, currentWord, true, () => onClickSegment(segInfo.idx))
           : <InlineMarkdown>{block}</InlineMarkdown>
         }
       </p>
     );
   }
 
+  // Multi-sentence paragraph — every word is individually clickable
   return (
     <p>
       {blockSegs.map(({ idx, seg }, i) => {
@@ -182,14 +170,9 @@ function MarkdownBlock({
           <span
             key={idx}
             ref={isActive ? setActiveRef : undefined}
-            onClick={() => onClickSegment(idx)}
-            className={`rounded-sm cursor-pointer transition-all duration-100 ${
-              isActive ? "sentence-active" : "hover:opacity-80"
-            }`}
+            className={`rounded-sm transition-all duration-100 ${isActive ? "sentence-active" : ""}`}
           >
-            {isActive
-              ? renderWordHighlights(seg.rawText, currentWord)
-              : seg.rawText}
+            {renderWords(seg.rawText, currentWord, isActive, () => onClickSegment(idx))}
             {i < blockSegs.length - 1 ? " " : ""}
           </span>
         );
@@ -209,7 +192,12 @@ function InlineMarkdown({ children }: { children: string }) {
   );
 }
 
-function renderWordHighlights(text: string, currentWord: number): React.ReactNode {
+function renderWords(
+  text: string,
+  currentWord: number,
+  isActive: boolean,
+  onClick: () => void
+): React.ReactNode {
   const parts = text.split(/(\s+)/);
   let wordIdx = 0;
   return (
@@ -217,8 +205,13 @@ function renderWordHighlights(text: string, currentWord: number): React.ReactNod
       {parts.map((part, i) => {
         if (/^\s+$/.test(part)) return part;
         const idx = wordIdx++;
+        const isCurrentWord = isActive && idx === currentWord;
         return (
-          <span key={i} className={idx === currentWord ? "word-active" : ""}>
+          <span
+            key={i}
+            onClick={(e) => { e.stopPropagation(); onClick(); }}
+            className={`word-clickable${isCurrentWord ? " word-active" : ""}`}
+          >
             {part}
           </span>
         );

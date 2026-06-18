@@ -147,14 +147,14 @@ export function PlayerControls({
               <StopIcon />
             </TransportBtn>
 
-            <TransportBtn onClick={onSkipBack} disabled={!hasContent} title="Previous sentence">
+            <TransportBtn onClick={onSkipBack} disabled={!hasContent} title="Previous sentence (←)">
               <SkipBackIcon />
             </TransportBtn>
 
             <button
               onClick={handlePlayPause}
               disabled={!hasContent}
-              title={isPlaying ? "Pause" : "Play"}
+              title={isPlaying ? "Pause (Space)" : "Play (Space)"}
               className="w-12 h-12 flex items-center justify-center rounded-full transition-all duration-100 disabled:opacity-30 disabled:cursor-not-allowed"
               style={{
                 background: "var(--accent)",
@@ -171,7 +171,7 @@ export function PlayerControls({
               {isLoading ? <SpinnerIcon /> : isPlaying ? <PauseIcon /> : <PlayIcon />}
             </button>
 
-            <TransportBtn onClick={onSkipForward} disabled={!hasContent} title="Next sentence">
+            <TransportBtn onClick={onSkipForward} disabled={!hasContent} title="Next sentence (→)">
               <SkipForwardIcon />
             </TransportBtn>
 
