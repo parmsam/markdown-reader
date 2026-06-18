@@ -56,5 +56,5 @@ jobs:
             ```bash
             xattr -dr com.apple.quarantine /Applications/Markdown\ Reader.app
             ```
-          releaseDraft: true
+          releaseDraft: false
           prerelease: false
