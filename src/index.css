@@ -1,0 +1,237 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* ─── CSS custom properties ─────────────────────────────────── */
+:root {
+  /* Light mode defaults */
+  --bg:          #f7f5f0;
+  --bg-subtle:   #f0ede6;
+  --bg-raised:   #ffffff;
+  --border:      #e0dbd1;
+  --border-soft: #ece8e0;
+  --text:        #1c1914;
+  --text-muted:  #6b6459;
+  --text-faint:  #9b9188;
+  --accent:      #c17a10;
+  --accent-bg:   #fef3c7;
+  --accent-ring: #fbbf24;
+
+  --sentence-bg: rgba(251, 191, 36, 0.18);
+  --word-bg:     rgba(245, 158, 11, 0.38);
+
+  --player-bg:   rgba(247, 245, 240, 0.92);
+  --player-fade: linear-gradient(to top, var(--bg) 0%, var(--bg) 70%, transparent 100%);
+}
+
+.dark {
+  --bg:          #131210;
+  --bg-subtle:   #0f0e0c;
+  --bg-raised:   #1c1a17;
+  --border:      #2c2920;
+  --border-soft: #252219;
+  --text:        #e8e4db;
+  --text-muted:  #9b9082;
+  --text-faint:  #635e56;
+  --accent:      #d97706;
+  --accent-bg:   rgba(120, 72, 6, 0.25);
+  --accent-ring: #b45309;
+
+  --sentence-bg: rgba(100, 65, 5, 0.22);
+  --word-bg:     rgba(210, 140, 10, 0.32);
+
+  --player-bg:   rgba(19, 18, 16, 0.94);
+  --player-fade: linear-gradient(to top, var(--bg) 0%, var(--bg) 70%, transparent 100%);
+}
+
+/* ─── Reset / base ───────────────────────────────────────────── */
+@layer base {
+  *, *::before, *::after { box-sizing: border-box; }
+
+  html, body, #root {
+    height: 100%;
+    margin: 0;
+    padding: 0;
+  }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: -apple-system, BlinkMacSystemFont, "Inter", system-ui, sans-serif;
+    -webkit-font-smoothing: antialiased;
+    transition: background 0.2s ease, color 0.2s ease;
+  }
+
+  ::selection {
+    background: rgba(245, 158, 11, 0.3);
+  }
+}
+
+/* ─── Prose reader ───────────────────────────────────────────── */
+@layer components {
+  .prose-reader {
+    font-family: Georgia, Cambria, "Times New Roman", serif;
+    font-size: 1.125rem;
+    line-height: 1.85;
+    color: var(--text);
+  }
+
+  .prose-reader h1 {
+    font-family: -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
+    font-size: 1.75rem;
+    font-weight: 700;
+    letter-spacing: -0.02em;
+    margin: 2rem 0 1rem;
+    color: var(--text);
+    padding-bottom: 0.6rem;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .prose-reader h2 {
+    font-family: -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
+    font-size: 1.35rem;
+    font-weight: 650;
+    letter-spacing: -0.015em;
+    margin: 1.75rem 0 0.6rem;
+    color: var(--text);
+  }
+
+  .prose-reader h3 {
+    font-family: -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
+    font-size: 1.15rem;
+    font-weight: 600;
+    margin: 1.5rem 0 0.4rem;
+    color: var(--text);
+  }
+
+  .prose-reader h4, .prose-reader h5, .prose-reader h6 {
+    font-family: -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
+    font-size: 1rem;
+    font-weight: 600;
+    margin: 1rem 0 0.3rem;
+    color: var(--text-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    font-size: 0.8rem;
+  }
+
+  .prose-reader p {
+    margin: 0 0 1.1rem;
+  }
+
+  .prose-reader ul, .prose-reader ol {
+    margin: 0 0 1rem 1.4rem;
+    padding: 0;
+  }
+
+  .prose-reader li {
+    margin-bottom: 0.4rem;
+  }
+
+  .prose-reader blockquote {
+    border-left: 2px solid var(--accent-ring);
+    padding: 0.2rem 0 0.2rem 1.1rem;
+    margin: 1.2rem 0;
+    color: var(--text-muted);
+    font-style: italic;
+  }
+
+  .prose-reader code {
+    font-family: "SF Mono", "JetBrains Mono", Monaco, "Cascadia Code", monospace;
+    font-size: 0.85em;
+    background: var(--bg-subtle);
+    border: 1px solid var(--border-soft);
+    padding: 0.1em 0.35em;
+    border-radius: 4px;
+    color: var(--accent);
+  }
+
+  .prose-reader pre {
+    background: var(--bg-subtle);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 1rem 1.25rem;
+    overflow-x: auto;
+    margin: 1.2rem 0;
+  }
+
+  .prose-reader pre code {
+    background: none;
+    border: none;
+    padding: 0;
+    color: var(--text-muted);
+    font-size: 0.875rem;
+  }
+
+  .prose-reader a {
+    color: var(--accent);
+    text-decoration-line: underline;
+    text-decoration-color: var(--border);
+    text-underline-offset: 3px;
+    transition: color 0.1s, text-decoration-color 0.1s;
+  }
+  .prose-reader a:hover {
+    text-decoration-color: var(--accent);
+  }
+
+  .prose-reader strong { font-weight: 700; color: var(--text); }
+  .prose-reader em { font-style: italic; }
+
+  .prose-reader hr {
+    border: none;
+    border-top: 1px solid var(--border);
+    margin: 2rem 0;
+  }
+
+  .prose-reader table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 1rem 0;
+    font-size: 0.9rem;
+  }
+  .prose-reader th {
+    background: var(--bg-subtle);
+    font-weight: 600;
+    padding: 0.5rem 0.75rem;
+    text-align: left;
+    border-bottom: 2px solid var(--border);
+  }
+  .prose-reader td {
+    padding: 0.45rem 0.75rem;
+    border-bottom: 1px solid var(--border-soft);
+  }
+
+  /* ── Highlighting ── */
+  .sentence-active {
+    background: var(--sentence-bg);
+    border-radius: 4px;
+    outline: 1px solid rgba(245, 158, 11, 0.15);
+    outline-offset: 1px;
+  }
+
+  .word-active {
+    background: var(--word-bg);
+    border-radius: 3px;
+    padding: 0 1px;
+  }
+
+  /* ── Scrollbar ── */
+  ::-webkit-scrollbar { width: 5px; height: 5px; }
+  ::-webkit-scrollbar-track { background: transparent; }
+  ::-webkit-scrollbar-thumb {
+    background: var(--border);
+    border-radius: 99px;
+  }
+  ::-webkit-scrollbar-thumb:hover { background: var(--text-faint); }
+}
+
+/* ── Player fade ── */
+.player-fade {
+  background: var(--player-fade);
+}
+
+/* ── Smooth theme transition for bg elements ── */
+.theme-transition,
+.theme-transition * {
+  transition: background-color 0.18s ease, border-color 0.18s ease, color 0.18s ease !important;
+}
