@@ -4,9 +4,10 @@ import { invoke } from "@tauri-apps/api/core";
 interface Props {
   onMarkdown: (md: string, title?: string) => void;
   onPaste: () => void;
+  version?: string;
 }
 
-export function WelcomeScreen({ onMarkdown, onPaste }: Props) {
+export function WelcomeScreen({ onMarkdown, onPaste, version }: Props) {
   const handleOpenFile = async () => {
     const selected = await open({
       multiple: false,
@@ -55,6 +56,9 @@ export function WelcomeScreen({ onMarkdown, onPaste }: Props) {
         <p className="text-sm" style={{ color: "var(--text-muted)" }}>
           Read aloud with Kokoro AI — highlights as it speaks
         </p>
+        {version && (
+          <p className="text-xs mt-1" style={{ color: "var(--text-faint)" }}>v{version}</p>
+        )}
       </div>
 
       {/* Actions */}

@@ -1,6 +1,7 @@
 import { useState, useCallback, useEffect, useMemo } from "react";
 import { open } from "@tauri-apps/plugin-dialog";
 import { invoke } from "@tauri-apps/api/core";
+import { getVersion } from "@tauri-apps/api/app";
 import { WelcomeScreen } from "./components/WelcomeScreen";
 import { PasteModal } from "./components/PasteModal";
 import { MarkdownViewer } from "./components/MarkdownViewer";
@@ -34,11 +35,16 @@ export default function App() {
   const [showSidebar, setShowSidebar] = useState(true);
   const [converting, setConverting] = useState(false);
   const [resumePrompt, setResumePrompt] = useState<number | null>(null);
+  const [appVersion, setAppVersion] = useState("");
   const [dark, setDark] = useState(() => {
     const saved = localStorage.getItem("theme");
     if (saved) return saved === "dark";
     return window.matchMedia("(prefers-color-scheme: dark)").matches;
   });
+
+  useEffect(() => {
+    getVersion().then(setAppVersion).catch(() => {});
+  }, []);
 
   useEffect(() => {
     document.documentElement.classList.toggle("dark", dark);
@@ -183,6 +189,14 @@ export default function App() {
           <span className="font-semibold text-sm truncate max-w-64" style={{ color: "var(--text)" }}>
             {doc?.title ?? "Markdown Reader"}
           </span>
+          {appVersion && (
+            <span
+              className="text-[10px] font-mono px-1.5 py-0.5 rounded"
+              style={{ color: "var(--text-faint)", background: "var(--bg-subtle)", border: "1px solid var(--border-soft)" }}
+            >
+              v{appVersion}
+            </span>
+          )}
         </div>
 
         <div className="flex-1" />
@@ -269,7 +283,7 @@ export default function App() {
               />
             </>
           ) : (
-            <WelcomeScreen onMarkdown={openDocument} onPaste={() => setShowPaste(true)} />
+            <WelcomeScreen onMarkdown={openDocument} onPaste={() => setShowPaste(true)} version={appVersion} />
           )}
 
           {doc && (
