@@ -4,6 +4,10 @@
   <p>A native macOS app for reading Markdown and PDF files aloud with real-time text highlighting,<br>powered by <a href="https://huggingface.co/hexgrad/Kokoro-82M">Kokoro TTS</a> running locally on Apple Silicon via <a href="https://github.com/ml-explore/mlx">MLX</a>.</p>
 </div>
 
+<div align="center">
+  <img src="docs/screenshot.png" width="800" alt="Markdown Reader showing the README with Features section highlighted and player controls"/>
+</div>
+
 ---
 
 ## Features

@@ -48,7 +48,9 @@ export function segmentMarkdown(markdown: string): TextSegment[] {
     if (!trimmed) continue;
 
     // Detect block type
-    if (/^#{1,6}\s/.test(trimmed)) {
+    if (/^</.test(trimmed)) {
+      // HTML block — skip TTS, nothing to read aloud
+    } else if (/^#{1,6}\s/.test(trimmed)) {
       // Heading - treat as single segment
       const plain = stripMarkdown(trimmed);
       if (plain) {

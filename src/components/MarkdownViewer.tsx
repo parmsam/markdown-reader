@@ -1,6 +1,7 @@
 import { useEffect, useRef, useMemo, useCallback } from "react";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
+import rehypeRaw from "rehype-raw";
 import type { TextSegment } from "../lib/textSegmenter";
 
 interface Props {
@@ -111,6 +112,7 @@ function MarkdownBlock({
   onClickSegment,
   activeRef,
 }: BlockProps) {
+  const isHtml = /^</.test(block);
   const isHeading = /^#{1,6}\s/.test(block);
   const isCode = /^```/.test(block);
   const isBlockquote = /^>/.test(block);
@@ -121,8 +123,12 @@ function MarkdownBlock({
     [activeRef]
   );
 
+  if (isHtml) {
+    return <ReactMarkdown remarkPlugins={[remarkGfm]} rehypePlugins={[rehypeRaw]}>{block}</ReactMarkdown>;
+  }
+
   if (isCode) {
-    return <ReactMarkdown remarkPlugins={[remarkGfm]}>{block}</ReactMarkdown>;
+    return <ReactMarkdown remarkPlugins={[remarkGfm]} rehypePlugins={[rehypeRaw]}>{block}</ReactMarkdown>;
   }
 
   if (isHeading || isBlockquote || isList) {
@@ -136,7 +142,7 @@ function MarkdownBlock({
           isActive ? "sentence-active" : "hover:opacity-80"
         }`}
       >
-        <ReactMarkdown remarkPlugins={[remarkGfm]}>{block}</ReactMarkdown>
+        <ReactMarkdown remarkPlugins={[remarkGfm]} rehypePlugins={[rehypeRaw]}>{block}</ReactMarkdown>
       </div>
     );
   }
@@ -185,6 +191,7 @@ function InlineMarkdown({ children }: { children: string }) {
   return (
     <ReactMarkdown
       remarkPlugins={[remarkGfm]}
+      rehypePlugins={[rehypeRaw]}
       components={{ p: ({ children }) => <>{children}</> }}
     >
       {children}
