@@ -5,7 +5,7 @@
 </div>
 
 <div align="center">
-  <img src="docs/markdown_reader_background_removed.png" width="800" alt="Markdown Reader showing the README with Features section highlighted and player controls"/>
+  <img src="docs/screenshot.png" width="800" alt="Markdown Reader showing the README with Features section highlighted and player controls"/>
 </div>
 
 ---
