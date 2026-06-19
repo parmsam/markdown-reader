@@ -1,6 +1,10 @@
-# Markdown Reader
+<div align="center">
+  <img src="src-tauri/icons/128x128.png" width="96" height="96" alt="Markdown Reader logo"/>
+  <h1>Markdown Reader</h1>
+  <p>A native macOS app for reading Markdown and PDF files aloud with real-time text highlighting,<br>powered by <a href="https://huggingface.co/hexgrad/Kokoro-82M">Kokoro TTS</a> running locally on Apple Silicon via <a href="https://github.com/ml-explore/mlx">MLX</a>.</p>
+</div>
 
-A native macOS desktop app for reading Markdown and PDF files aloud with real-time text highlighting, powered by [Kokoro TTS](https://huggingface.co/hexgrad/Kokoro-82M) running locally on Apple Silicon via [MLX](https://github.com/ml-explore/mlx).
+---
 
 ## Features
 
