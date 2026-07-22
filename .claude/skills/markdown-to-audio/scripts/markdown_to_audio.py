@@ -23,6 +23,10 @@ import numpy as np
 
 
 def strip_markdown(text: str) -> str:
+    # Unescape CommonMark backslash-escapes (e.g. marker-pdf emits "\_\_\_\_" for
+    # signature/blank lines) before the emphasis regexes below, so escaped runs of
+    # punctuation don't survive as literal backslashes in the narrated text.
+    text = re.sub(r"\\([\\`*_{}\[\]()#+\-.!>~])", r"\1", text)
     text = re.sub(r"\*\*(.+?)\*\*", r"\1", text)
     text = re.sub(r"\*(.+?)\*", r"\1", text)
     text = re.sub(r"__(.+?)__", r"\1", text)
@@ -36,6 +40,12 @@ def strip_markdown(text: str) -> str:
     text = re.sub(r"[-*+]\s+", "", text)
     text = re.sub(r"\d+\.\s+", "", text)
     return text.strip()
+
+
+def has_speakable_content(text: str) -> bool:
+    """True if text has at least one letter or digit — filters out lines that are
+    pure punctuation/underscores (e.g. signature-line placeholders like "____")."""
+    return bool(re.search(r"[A-Za-z0-9]", text))
 
 
 def split_sentences(text: str) -> list:
@@ -60,21 +70,21 @@ def segment_markdown(markdown: str) -> list:
             continue  # thematic break (horizontal rule), nothing to read aloud
         elif re.match(r"^#{1,6}\s", trimmed):
             plain = strip_markdown(trimmed)
-            if plain:
+            if plain and has_speakable_content(plain):
                 segments.append(plain)
         elif re.match(r"^```", trimmed):
             segments.append("code block")
         elif re.match(r"^>", trimmed):
             plain = strip_markdown(trimmed)
-            segments.extend(s for s in split_sentences(plain) if s.strip())
+            segments.extend(s for s in split_sentences(plain) if s.strip() and has_speakable_content(s))
         elif re.match(r"^[-*+]\s|^\d+\.\s", trimmed):
             for line in trimmed.split("\n"):
                 plain = strip_markdown(line)
-                if plain:
+                if plain and has_speakable_content(plain):
                     segments.append(plain)
         else:
             plain = strip_markdown(trimmed)
-            segments.extend(s for s in split_sentences(plain) if s.strip())
+            segments.extend(s for s in split_sentences(plain) if s.strip() and has_speakable_content(s))
 
     return segments
 
