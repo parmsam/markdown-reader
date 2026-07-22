@@ -40,3 +40,6 @@ __pycache__/
 # Generated narration audio (markdown-to-audio skill)
 *.wav
 *.mp3
+
+# Claude Code runtime state
+.claude/scheduled_tasks.lock
