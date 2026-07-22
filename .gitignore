@@ -36,3 +36,7 @@ __pycache__/
 
 # Model cache (mlx downloads can be large)
 ~/.cache/huggingface/
+
+# Generated narration audio (markdown-to-audio skill)
+*.wav
+*.mp3

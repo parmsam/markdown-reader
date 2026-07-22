@@ -1,0 +1,4 @@
+mlx-audio>=0.4.4
+misaki>=0.7.4
+num2words
+numpy
