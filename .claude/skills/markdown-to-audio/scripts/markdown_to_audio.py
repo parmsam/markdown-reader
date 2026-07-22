@@ -153,6 +153,43 @@ def write_wav(path: str, audio: np.ndarray, sample_rate: int) -> None:
         wf.writeframes(pcm.tobytes())
 
 
+def narrate_to_wav(markdown: str, output_path: str, voice: str = "af_heart",
+                    speed: float = 1.0, pause: float = 0.35, model=None) -> tuple:
+    """
+    Segment markdown, narrate every segment with Kokoro, and write one WAV file.
+    Returns (duration_seconds, segment_count). Shared by this script's CLI and by
+    other skills (e.g. pdf-to-audio) that produce markdown from another source.
+    """
+    segments = segment_markdown(markdown)
+    if not segments:
+        raise ValueError("No readable text found in input.")
+
+    if model is None:
+        print("Loading Kokoro model (first run may take a few seconds)...", file=sys.stderr)
+        model = load_model()
+    sample_rate = getattr(model, "sample_rate", 24000)
+    silence = np.zeros(int(sample_rate * pause), dtype=np.float32)
+
+    all_audio = []
+    total = len(segments)
+    for i, seg in enumerate(segments, 1):
+        text = pad_if_short(seg)
+        print(f"[{i}/{total}] {seg[:60]!r}", file=sys.stderr)
+        audio = generate_segment_audio(model, text, voice, speed)
+        if audio is None:
+            print(f"  warning: no audio produced for segment {i}, skipping", file=sys.stderr)
+            continue
+        all_audio.append(audio)
+        all_audio.append(silence)
+
+    if not all_audio:
+        raise RuntimeError("Failed to generate any audio.")
+
+    combined = np.concatenate(all_audio)
+    write_wav(output_path, combined, sample_rate)
+    return len(combined) / sample_rate, total
+
+
 def main():
     parser = argparse.ArgumentParser(description="Convert markdown to a narrated audio file")
     parser.add_argument("input", nargs="?", help="Path to a markdown file (omit to read stdin)")
@@ -168,35 +205,12 @@ def main():
     else:
         markdown = sys.stdin.read()
 
-    segments = segment_markdown(markdown)
-    if not segments:
-        print("No readable text found in input.", file=sys.stderr)
+    try:
+        duration, total = narrate_to_wav(markdown, args.output, args.voice, args.speed, args.pause)
+    except (ValueError, RuntimeError) as e:
+        print(str(e), file=sys.stderr)
         sys.exit(1)
 
-    print("Loading Kokoro model (first run may take a few seconds)...", file=sys.stderr)
-    model = load_model()
-    sample_rate = getattr(model, "sample_rate", 24000)
-    silence = np.zeros(int(sample_rate * args.pause), dtype=np.float32)
-
-    all_audio = []
-    total = len(segments)
-    for i, seg in enumerate(segments, 1):
-        text = pad_if_short(seg)
-        print(f"[{i}/{total}] {seg[:60]!r}", file=sys.stderr)
-        audio = generate_segment_audio(model, text, args.voice, args.speed)
-        if audio is None:
-            print(f"  warning: no audio produced for segment {i}, skipping", file=sys.stderr)
-            continue
-        all_audio.append(audio)
-        all_audio.append(silence)
-
-    if not all_audio:
-        print("Failed to generate any audio.", file=sys.stderr)
-        sys.exit(1)
-
-    combined = np.concatenate(all_audio)
-    write_wav(args.output, combined, sample_rate)
-    duration = len(combined) / sample_rate
     print(f"Wrote {args.output} ({duration:.1f}s, {total} segments)", file=sys.stderr)
 
 

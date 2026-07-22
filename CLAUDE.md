@@ -46,7 +46,7 @@ This starts:
 ### Python (system Python 3.14 at `/Library/Frameworks/Python.framework/Versions/3.14/bin/python3`)
 - `mlx-audio>=0.4.4` — Kokoro TTS on Apple Silicon
 - `misaki` + `num2words` + `spacy` + `phonemizer` — text processing for Kokoro
-- `marker-pdf>=1.10.0` — PDF to markdown conversion
+- `marker-pdf>=2.0.0` — PDF to markdown conversion
 - `en_core_web_sm` (spacy model) — must be installed separately:
   ```bash
   uv pip install --system https://github.com/explosion/spacy-models/releases/download/en_core_web_sm-3.8.0/en_core_web_sm-3.8.0-py3-none-any.whl

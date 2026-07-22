@@ -20,6 +20,7 @@
 - **PDF conversion** — converts PDF → Markdown via [marker](https://github.com/datalab-to/marker)
 - **Three input methods**: open file (`.md`, `.pdf`, `.txt`), paste markdown, or drag & drop
 - **Light & dark mode** with system preference detection
+- **[Claude Code skills](#claude-code-skills)** — narrate any markdown or PDF into a standalone `.wav` file from the CLI, no app needed
 
 ## Tech Stack
 
@@ -143,6 +144,24 @@ npm run tauri build
 | `am_michael` | Michael | US English (M) |
 | `bf_emma` | Emma | British English (F) |
 | `bm_george` | George | British English (M) |
+
+## Claude Code Skills
+
+This repo ships two [Claude Code skills](.claude/skills) that narrate documents into a
+standalone `.wav` file using the same Kokoro/MLX pipeline as the app, but from the CLI and
+without opening it:
+
+- **[`markdown-to-audio`](.claude/skills/markdown-to-audio/SKILL.md)** — paste markdown or point
+  it at a file; it strips formatting, segments the text into sentences, and writes a playable
+  WAV (`afplay output.wav` to preview). Fully self-contained — bundles its own script and
+  `requirements.txt`, so it can be copied to `~/.claude/skills/` on any Apple Silicon Mac with
+  Claude Code and used outside this repo entirely.
+- **[`pdf-to-audio`](.claude/skills/pdf-to-audio/SKILL.md)** — same idea for PDFs: converts
+  PDF → Markdown with [marker-pdf](https://github.com/datalab-to/marker) first, then narrates
+  the result via `markdown-to-audio`'s script. Depends on `markdown-to-audio` being installed
+  alongside it (copy both folders together).
+
+Both accept a voice/speed and print progress as they go.
 
 ## Tauri Commands
 
