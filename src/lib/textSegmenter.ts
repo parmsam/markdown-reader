@@ -10,6 +10,10 @@ export interface TextSegment {
 // Strip markdown formatting for TTS
 function stripMarkdown(text: string): string {
   return text
+    // Unescape CommonMark backslash-escapes (e.g. marker-pdf emits "\_\_\_\_" for
+    // signature/blank lines) before the emphasis rules below, so escaped runs of
+    // punctuation don't survive as literal backslashes in the narrated text.
+    .replace(/\\([\\`*_{}[\]()#+\-.!>~])/g, "$1")
     .replace(/\*\*(.+?)\*\*/g, "$1")
     .replace(/\*(.+?)\*/g, "$1")
     .replace(/__(.+?)__/g, "$1")
@@ -23,6 +27,12 @@ function stripMarkdown(text: string): string {
     .replace(/[-*+]\s+/g, "")
     .replace(/\d+\.\s+/g, "")
     .trim();
+}
+
+// True if text has at least one letter or digit — filters out lines that are pure
+// punctuation/underscores (e.g. signature-line placeholders like "____").
+function hasSpeakableContent(text: string): boolean {
+  return /[A-Za-z0-9]/.test(text);
 }
 
 // Split text into sentences
@@ -50,10 +60,12 @@ export function segmentMarkdown(markdown: string): TextSegment[] {
     // Detect block type
     if (/^</.test(trimmed)) {
       // HTML block — skip TTS, nothing to read aloud
+    } else if (/^(-{3,}|\*{3,}|_{3,})$/.test(trimmed)) {
+      // Thematic break (horizontal rule) — nothing to read aloud
     } else if (/^#{1,6}\s/.test(trimmed)) {
       // Heading - treat as single segment
       const plain = stripMarkdown(trimmed);
-      if (plain) {
+      if (plain && hasSpeakableContent(plain)) {
         segments.push({
           id: `seg-${globalSentenceIndex}`,
           text: plain,
@@ -78,7 +90,7 @@ export function segmentMarkdown(markdown: string): TextSegment[] {
       const plain = stripMarkdown(trimmed);
       const sentences = splitSentences(plain);
       for (const sentence of sentences) {
-        if (sentence.trim()) {
+        if (sentence.trim() && hasSpeakableContent(sentence)) {
           segments.push({
             id: `seg-${globalSentenceIndex}`,
             text: sentence.trim(),
@@ -94,7 +106,7 @@ export function segmentMarkdown(markdown: string): TextSegment[] {
       const lines = trimmed.split("\n");
       for (const line of lines) {
         const plain = stripMarkdown(line);
-        if (plain) {
+        if (plain && hasSpeakableContent(plain)) {
           segments.push({
             id: `seg-${globalSentenceIndex}`,
             text: plain,
@@ -110,7 +122,7 @@ export function segmentMarkdown(markdown: string): TextSegment[] {
       const plain = stripMarkdown(trimmed);
       const sentences = splitSentences(plain);
       for (const sentence of sentences) {
-        if (sentence.trim()) {
+        if (sentence.trim() && hasSpeakableContent(sentence)) {
           segments.push({
             id: `seg-${globalSentenceIndex}`,
             text: sentence.trim(),
